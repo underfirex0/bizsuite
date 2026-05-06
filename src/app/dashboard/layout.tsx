@@ -11,17 +11,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   // Get user's organization
   const { data: membership } = await supabase
     .from('organization_members')
-    .select('organizations(id, name), profiles(full_name, email)')
+    .select('organization_id, organizations(id, name), profiles(full_name, email)')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
-  if (!membership) redirect('/auth/register')
-
-  const org = membership.organizations as { id: string; name: string } | null
-  const profile = membership.profiles as { full_name: string | null; email: string } | null
+  // If no org found, still show dashboard (don't redirect to register which causes loop)
+  const org = (membership as any)?.organizations
+  const profile = (membership as any)?.profiles
 
   return (
-    <div className="flex h-screen bg-surface-50 overflow-hidden">
+    <div className="flex h-screen bg-zinc-50 overflow-hidden">
       <Sidebar
         orgName={org?.name ?? 'Mon Organisation'}
         userEmail={profile?.email ?? user.email ?? ''}
