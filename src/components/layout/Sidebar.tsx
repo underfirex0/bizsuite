@@ -59,7 +59,7 @@ export function Sidebar({ orgName, userEmail, userName }: SidebarProps) {
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {NAV_ITEMS.map(({ href, label, icon: Icon, exact }) => {
-          const isActive = exact ? pathname === href : pathname.startsWith(href)
+          const isActive = exact ? pathname === href : (href !== '/dashboard' && pathname.startsWith(href))
           return (
             <Link
               key={href}
