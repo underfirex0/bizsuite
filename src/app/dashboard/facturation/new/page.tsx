@@ -38,7 +38,7 @@ export default function NewInvoicePage() {
       if (!user) return
 
       const { data: m } = await supabase
-        .from('organization_members').select('organization_id').eq('user_id', user.id).single()
+        .from('organization_members').select('organization_id').eq('user_id', user.id).maybeSingle()
       if (!m) return
       setOrgId(m.organization_id)
 

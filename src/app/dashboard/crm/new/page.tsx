@@ -29,7 +29,7 @@ export default function NewClientPage() {
     if (!user) { router.push('/auth/login'); return }
 
     const { data: membershipData } = await supabase
-      .from('organization_members').select('organization_id').eq('user_id', user.id).single()
+      .from('organization_members').select('organization_id').eq('user_id', user.id).maybeSingle()
     const membership = membershipData as any
     if (!membership) { setError('Organisation introuvable.'); setLoading(false); return }
 
