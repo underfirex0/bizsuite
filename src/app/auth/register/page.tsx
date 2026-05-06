@@ -58,7 +58,7 @@ export default function RegisterPage() {
       organization_id: org.id,
       user_id: authData.user.id,
       role: 'owner',
-    })
+    } as any)
 
     router.push('/dashboard')
     router.refresh()
