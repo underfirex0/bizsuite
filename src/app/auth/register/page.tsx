@@ -41,13 +41,13 @@ export default function RegisterPage() {
       .replace(/-+/g, '-')
       .slice(0, 40) + '-' + Date.now().toString(36)
 
-    const { data: org, error: orgError } = await supabase
+    const { data: orgData, error: orgError } = await supabase
       .from('organizations')
-      .insert({ name: form.company, slug })
-      .select()
+      .insert({ name: form.company, slug } as any)
+      .select('id')
       .single()
 
-    if (orgError || !org) {
+    if (orgError || !orgData) {
       setError('Erreur lors de la création de l\'organisation.')
       setLoading(false)
       return
@@ -55,7 +55,7 @@ export default function RegisterPage() {
 
     // 3. Add user as owner
     await supabase.from('organization_members').insert({
-      organization_id: org.id,
+      organization_id: (orgData as any).id,
       user_id: authData.user.id,
       role: 'owner',
     })
