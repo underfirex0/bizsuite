@@ -28,8 +28,9 @@ export default function NewClientPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { router.push('/auth/login'); return }
 
-    const { data: membership } = await supabase
+    const { data: membershipData } = await supabase
       .from('organization_members').select('organization_id').eq('user_id', user.id).single()
+    const membership = membershipData as any
     if (!membership) { setError('Organisation introuvable.'); setLoading(false); return }
 
     const { error: err } = await supabase.from('clients').insert({
