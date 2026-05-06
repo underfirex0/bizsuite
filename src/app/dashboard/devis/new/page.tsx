@@ -80,12 +80,12 @@ export default function NewDevisPage() {
       currency: 'MAD',
       created_by: user.id,
       client_id: form.client_id || null,
-    }).select().single()
+    } as any).select().single()
 
     if (error || !quote) { setLoading(false); return }
 
     await supabase.from('quote_items').insert(
-      items.map((item, i) => ({ quote_id: quote.id, ...item, subtotal: subtotalItem(item), position: i }))
+      items.map((item, i) => ({ quote_id: (quote as any).id, ...item, subtotal: subtotalItem(item), position: i })) as any
     )
     await supabase.from('organizations').update({
       next_quote_number: (org?.next_quote_number ?? 1) + 1
@@ -100,7 +100,7 @@ export default function NewDevisPage() {
         <Link href="/dashboard/devis" className="btn-ghost px-2"><ArrowLeft className="w-4 h-4" /></Link>
         <div>
           <h1 className="page-title">Nouveau devis</h1>
-          <p className="text-sm text-surface-500">Remplissez les détails du devis</p>
+          <p className="text-sm text-zinc-500">Remplissez les détails du devis</p>
         </div>
       </div>
 
@@ -132,9 +132,9 @@ export default function NewDevisPage() {
         </div>
 
         <div className="card p-6">
-          <h2 className="font-medium text-surface-900 mb-4">Prestations</h2>
+          <h2 className="font-medium text-zinc-900 mb-4">Prestations</h2>
           <div className="space-y-3">
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-surface-500 px-1">
+            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-zinc-500 px-1">
               <div className="col-span-4">Description</div>
               <div className="col-span-2">Qté</div>
               <div className="col-span-2">P.U.</div>
@@ -160,32 +160,32 @@ export default function NewDevisPage() {
                   <input className="input text-sm" type="number" min="0" max="100"
                     value={item.tax_rate} onChange={e => setItem(i, 'tax_rate', parseFloat(e.target.value) || 0)} />
                 </div>
-                <div className="col-span-2 text-sm font-medium text-right text-surface-700 px-2">
+                <div className="col-span-2 text-sm font-medium text-right text-zinc-700 px-2">
                   {fmt(subtotalItem(item) + taxItem(item))}
                 </div>
                 <div className="col-span-1 flex justify-end">
                   {items.length > 1 && (
                     <button onClick={() => setItems(p => p.filter((_, idx) => idx !== i))}
-                      className="p-1.5 text-surface-400 hover:text-red-500 rounded-lg hover:bg-red-50">
+                      className="p-1.5 text-zinc-400 hover:text-red-500 rounded-lg hover:bg-red-50">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
               </div>
             ))}
-            <button onClick={() => setItems(p => [...p, defaultItem()])} className="btn-ghost text-brand-600 text-sm">
+            <button onClick={() => setItems(p => [...p, defaultItem()])} className="btn-ghost text-indigo-600 text-sm">
               <Plus className="w-3.5 h-3.5" /> Ajouter une ligne
             </button>
           </div>
-          <div className="mt-6 pt-5 border-t border-surface-100 flex justify-end">
+          <div className="mt-6 pt-5 border-t border-zinc-100 flex justify-end">
             <div className="w-64 space-y-2">
-              <div className="flex justify-between text-sm text-surface-600">
+              <div className="flex justify-between text-sm text-zinc-600">
                 <span>Sous-total HT</span><span>{fmt(subtotal)} MAD</span>
               </div>
-              <div className="flex justify-between text-sm text-surface-600">
+              <div className="flex justify-between text-sm text-zinc-600">
                 <span>TVA</span><span>{fmt(taxAmount)} MAD</span>
               </div>
-              <div className="flex justify-between text-base font-semibold text-surface-900 pt-2 border-t border-surface-100">
+              <div className="flex justify-between text-base font-semibold text-zinc-900 pt-2 border-t border-zinc-100">
                 <span>Total TTC</span><span>{fmt(total)} MAD</span>
               </div>
             </div>

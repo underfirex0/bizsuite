@@ -37,7 +37,7 @@ export default function NewClientPage() {
       organization_id: membership.organization_id,
       created_by: user.id,
       tags: [],
-    })
+    } as any)
 
     if (err) { setError(err.message); setLoading(false); return }
     router.push('/dashboard/crm')
@@ -51,13 +51,13 @@ export default function NewClientPage() {
         </Link>
         <div>
           <h1 className="page-title">Nouveau client</h1>
-          <p className="text-sm text-surface-500">Remplissez les informations du client</p>
+          <p className="text-sm text-zinc-500">Remplissez les informations du client</p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card p-6 space-y-4">
-          <h2 className="font-medium text-surface-900">Informations générales</h2>
+          <h2 className="font-medium text-zinc-900">Informations générales</h2>
           
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -105,7 +105,7 @@ export default function NewClientPage() {
         </div>
 
         <div className="card p-6 space-y-4">
-          <h2 className="font-medium text-surface-900">Adresse</h2>
+          <h2 className="font-medium text-zinc-900">Adresse</h2>
           <div>
             <label className="input-label">Adresse</label>
             <input className="input" placeholder="123 Rue Mohammed V" value={form.address} onChange={set('address')} />
@@ -130,7 +130,7 @@ export default function NewClientPage() {
         </div>
 
         <div className="card p-6 space-y-4">
-          <h2 className="font-medium text-surface-900">Notes</h2>
+          <h2 className="font-medium text-zinc-900">Notes</h2>
           <textarea className="input resize-none h-24" placeholder="Informations supplémentaires…" value={form.notes} onChange={set('notes')} />
         </div>
 
