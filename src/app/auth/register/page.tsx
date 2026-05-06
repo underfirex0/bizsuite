@@ -58,6 +58,7 @@ export default function RegisterPage() {
       organization_id: (orgData as any).id,
       user_id: authData.user.id,
       role: 'owner',
+    } as any)
     })
 
     router.push('/dashboard')
