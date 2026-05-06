@@ -43,7 +43,7 @@ export default function RegisterPage() {
 
     const { data: org, error: orgError } = await supabase
       .from('organizations')
-      .insert({ name: form.company, slug })
+      .insert({ name: form.company, slug } as any)
       .select()
       .single()
 
