@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard, Users, FileText, Receipt, BarChart3,
-  Settings, LogOut, ChevronDown, Building2, Car, ChevronRight
+  Settings, LogOut, ChevronDown, Building2, Car, ChevronRight, Wrench
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
@@ -29,6 +29,7 @@ export function Sidebar({ orgName, userEmail, userName, activeModules = [] }: Si
   const pathname = usePathname()
   const router = useRouter()
   const [locationOpen, setLocationOpen] = useState(pathname.startsWith('/dashboard/location'))
+  const [interventionsOpen, setInterventionsOpen] = useState(pathname.startsWith('/dashboard/interventions'))
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -95,6 +96,39 @@ export function Sidebar({ orgName, userEmail, userName, activeModules = [] }: Si
                   { href: '/dashboard/location/vehicles', label: 'Flotte' },
                   { href: '/dashboard/location/rentals', label: 'Contrats' },
                   { href: '/dashboard/location/new-rental', label: '+ Nouvelle location' },
+                ].map(item => (
+                  <Link key={item.href} href={item.href}
+                    className={clsx(
+                      'block px-2 py-1.5 text-xs rounded-lg transition-colors',
+                      pathname === item.href
+                        ? 'text-indigo-700 bg-indigo-50 font-medium'
+                        : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-50'
+                    )}>
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+            {/* Interventions Module */}
+            <button
+              onClick={() => setInterventionsOpen(o => !o)}
+              className={clsx('nav-item w-full text-left', pathname.startsWith('/dashboard/interventions') && 'active')}
+            >
+              <Wrench className="w-4 h-4 shrink-0" />
+              <span className="flex-1 text-left">Interventions</span>
+              <ChevronRight className={clsx('w-3.5 h-3.5 transition-transform duration-150', interventionsOpen && 'rotate-90')} />
+            </button>
+
+            {interventionsOpen && (
+              <div className="ml-6 mt-1 space-y-0.5 pl-3 border-l border-zinc-100">
+                {[
+                  { href: '/dashboard/interventions', label: "Vue d'ensemble" },
+                  { href: '/dashboard/interventions/list', label: 'Interventions' },
+                  { href: '/dashboard/interventions/contrats', label: 'Contrats' },
+                  { href: '/dashboard/interventions/techniciens', label: 'Techniciens' },
+                  { href: '/dashboard/interventions/new', label: '+ Nouvelle' },
                 ].map(item => (
                   <Link key={item.href} href={item.href}
                     className={clsx(
