@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Loader2 } from 'lucide-react'
@@ -10,8 +10,9 @@ export default function NewClientPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [orgId, setOrgId] = useState('')
-  const [userId, setUserId] = useState('')
+  const orgIdRef = useRef('')
+  const userIdRef = useRef('')
+  const [ready, setReady] = useState(false)
   const [form, setForm] = useState({
     name: '', type: 'company', status: 'prospect', email: '',
     phone: '', website: '', address: '', city: '', country: 'MA',
@@ -22,14 +23,23 @@ export default function NewClientPage() {
     const load = async () => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-      setUserId(user.id)
-      const { data } = await supabase
+      if (!user) { router.push('/auth/login'); return }
+      userIdRef.current = user.id
+
+      const { data, error } = await supabase
         .from('organization_members')
         .select('organization_id')
         .eq('user_id', user.id)
         .maybeSingle()
-      if (data) setOrgId((data as any).organization_id)
+
+      console.log('org fetch result:', data, error)
+
+      if (data) {
+        orgIdRef.current = (data as any).organization_id
+        setReady(true)
+      } else {
+        setError(`Erreur: ${error?.message ?? 'Aucune organisation trouvée'}`)
+      }
     }
     load()
   }, [])
@@ -39,14 +49,15 @@ export default function NewClientPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!orgId) { setError('Organisation introuvable. Rechargez la page.'); return }
+    console.log('orgId at submit:', orgIdRef.current)
+    if (!orgIdRef.current) { setError('Organisation introuvable. Déconnectez-vous et reconnectez-vous.'); return }
     setLoading(true)
     setError('')
     const supabase = createClient()
     const { error: err } = await supabase.from('clients').insert({
       ...form,
-      organization_id: orgId,
-      created_by: userId,
+      organization_id: orgIdRef.current,
+      created_by: userIdRef.current,
       tags: [],
     } as any)
     if (err) { setError(err.message); setLoading(false); return }
@@ -59,9 +70,12 @@ export default function NewClientPage() {
         <Link href="/dashboard/crm" className="btn-ghost px-2"><ArrowLeft className="w-4 h-4" /></Link>
         <div>
           <h1 className="page-title">Nouveau client</h1>
-          <p className="text-sm text-zinc-500">Remplissez les informations du client</p>
+          <p className="text-sm text-zinc-500">
+            {ready ? '✅ Organisation chargée' : '⏳ Chargement...'}
+          </p>
         </div>
       </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="card p-6 space-y-4">
           <h2 className="font-medium text-zinc-900">Informations générales</h2>
@@ -105,6 +119,7 @@ export default function NewClientPage() {
             <input className="input" placeholder="ICE ou numéro TVA" value={form.tax_number} onChange={set('tax_number')} />
           </div>
         </div>
+
         <div className="card p-6 space-y-4">
           <h2 className="font-medium text-zinc-900">Adresse</h2>
           <div>
@@ -127,13 +142,18 @@ export default function NewClientPage() {
             </div>
           </div>
         </div>
+
         <div className="card p-6 space-y-4">
           <h2 className="font-medium text-zinc-900">Notes</h2>
           <textarea className="input resize-none h-24" placeholder="Informations supplémentaires…" value={form.notes} onChange={set('notes')} />
         </div>
-        {error && <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{error}</div>}
+
+        {error && (
+          <div className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{error}</div>
+        )}
+
         <div className="flex items-center gap-3">
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading || !ready}>
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             {loading ? 'Enregistrement…' : 'Enregistrer le client'}
           </button>
