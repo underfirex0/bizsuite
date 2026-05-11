@@ -56,6 +56,12 @@ export default async function DevisPage() {
                       <td className="font-medium text-zinc-900">{fmt(q.total)}</td>
                       <td><span className={`badge ${STATUS_COLOR[status]}`}>{STATUS_LABEL[status]}</span></td>
                       <td>{q.status === 'accepted' && <Link href={`/dashboard/facturation/new?from_quote=${q.id}`} className="text-xs text-indigo-600 hover:underline font-medium">→ Facturer</Link>}</td>
+                      <td>
+                        <a href={`/dashboard/devis/print/${q.id}`} target="_blank"
+                          className="text-xs text-amber-600 hover:underline font-medium">
+                          ⬇ PDF
+                        </a>
+                      </td>
                     </tr>
                   )
                 })}
